@@ -28,7 +28,7 @@
     "@eslint/js": "latest",
     "@incutonez/eslint-plugin": "^2.1.4",
     "@stylistic/eslint-plugin-ts": "^4.2.0",
-    "@tailwindcss/vite": "^4.1.5",
+    "@tailwindcss/vite": "^4.1.7",
     "@types/mime-types": "^2.1.4",
     "@types/node": "^22.15.17",
     "@types/papaparse": "^5.3.16",
