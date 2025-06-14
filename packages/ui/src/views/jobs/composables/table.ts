@@ -1,5 +1,5 @@
 ﻿import { h } from "vue";
-import { type ApplicationViewModel, EnumApplicationStatus } from "@incutonez/life-stats-spec";
+import { type ApplicationViewModel, EnumApplicationStatus, EnumLocationTypes } from "@incutonez/life-stats-spec";
 import { useDateColumn } from "@/composables/table.ts";
 import type { ITable, ITableColumn, ITableRow } from "@/types/components.ts";
 import { getEnumDisplay } from "@/utils/common.ts";
@@ -78,7 +78,6 @@ export function useApplicationsColumns(table: ITable<ApplicationViewModel>, show
 			id: "companyName",
 			accessorKey: "company.name",
 			header: "Company Name",
-			cell: (info) => info.getValue(),
 		});
 	}
 	columns.push({
@@ -90,9 +89,16 @@ export function useApplicationsColumns(table: ITable<ApplicationViewModel>, show
 			status: row.original.status,
 		}),
 	}, {
+		accessorKey: "locationType",
+		header: "Location",
+		cell: (info) => getEnumDisplay(EnumLocationTypes, info.getValue<number>()),
+		meta: {
+			columnWidth: "min-w-auto",
+			columnAlign: "center",
+		},
+	}, {
 		accessorKey: "site",
 		header: "Site",
-		cell: (info) => info.getValue(),
 	}, {
 		accessorKey: "compensation",
 		header: "Compensation",

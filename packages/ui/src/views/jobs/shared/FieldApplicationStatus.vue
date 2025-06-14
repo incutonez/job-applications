@@ -1,6 +1,6 @@
 ﻿<script setup lang="ts">
 import FieldComboBox from "@/components/FieldComboBox.vue";
-import { ApplicationStatusOptions } from "@/enumOptions.ts";
+import { ApplicationStatusOptions } from "@/views/jobs/options.ts";
 </script>
 
 <template>
@@ -9,7 +9,6 @@ import { ApplicationStatusOptions } from "@/enumOptions.ts";
 		label-align="top"
 		value-field="id"
 		display-field="display"
-		combo-width="w-52"
 		:value-only="true"
 		:options="ApplicationStatusOptions"
 	/>

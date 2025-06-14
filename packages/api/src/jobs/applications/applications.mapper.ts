@@ -4,17 +4,17 @@ import { differenceInWeeks, endOfDay, isSunday, nextSunday } from "date-fns";
 import { v4 as getUUID } from "uuid";
 import { SessionStorageService } from "@/auth/session.storage.service";
 import { SESSION_STORAGE } from "@/constants";
-import { ApplicationModel, IApplicationCreateModel, IApplicationUpdateModel } from "@/db/models/ApplicationModel";
 import { CommentsMapper } from "@/jobs/applications/comments.mapper";
 import { IUploadApplicationModel } from "@/jobs/applications/types";
 import { CompaniesMapper } from "@/jobs/companies/companies.mapper";
-import { EnumApplicationStatus } from "@/types";
+import { EnumApplicationStatus, EnumLinkType, EnumLocationTypes } from "@/jobs/constants";
+import { ApplicationModel, IApplicationCreateModel, IApplicationUpdateModel } from "@/jobs/models/ApplicationModel";
 import {
-	IApplicationCreateViewModel,
+	IApplicationCreateViewModel, IApplicationLinkViewModel,
 	IApplicationNestedViewModel,
 	IApplicationUpdateViewModel,
 	IApplicationViewModel,
-} from "@/viewModels/application.viewmodel";
+} from "@/jobs/viewModels/application.viewmodel";
 
 const DomainRegex = /https?:\/\/.*?([^./]+?\.[^.]+?(?:\.\w{2})?)(?:\/|$)/;
 
@@ -72,11 +72,12 @@ export class ApplicationsMapper implements OnModuleInit {
 	 * There are times (like when we do GET applicationId), where we want to use the actual status and not the altered one
 	 * we use in the list, which is why we have the rawStatus param
 	 */
-	entityToViewModel({ id, updated_at, created_at, user_id, company, position_title, date_applied, url, compensation, status, comments }: ApplicationModel, rawStatus = false): IApplicationViewModel {
+	entityToViewModel({ id, updated_at, linked = [], links = [], location_type, created_at, user_id, company, position_title, date_applied, url, compensation, status, comments }: ApplicationModel, rawStatus = false): IApplicationViewModel {
 		return {
 			id,
 			url,
 			compensation,
+			locationType: location_type,
 			status: rawStatus ? status : getStatusFromApplied(status, date_applied),
 			userId: user_id,
 			site: this.urlToSite(url),
@@ -86,14 +87,25 @@ export class ApplicationsMapper implements OnModuleInit {
 			dateApplied: date_applied,
 			company: this.companiesMapper.entityToViewModel(company),
 			comments: comments.map((comment) => this.commentsMapper.entityToViewModel(comment)) ?? [],
+			links: [...linked.map((linkedItem) => this.entityLinkedToViewModel(linkedItem, EnumLinkType.To)), ...links.map((linkedItem) => this.entityLinkedToViewModel(linkedItem, EnumLinkType.From))],
 		};
 	}
 
-	entityNestedToViewModel({ id, updated_at, user_id, created_at, position_title, date_applied, url, compensation, status, comments }: ApplicationModel): IApplicationNestedViewModel {
+	entityLinkedToViewModel({ id, position_title, status }: ApplicationModel, type: EnumLinkType): IApplicationLinkViewModel {
+		return {
+			id,
+			status,
+			type,
+			positionTitle: position_title,
+		};
+	}
+
+	entityNestedToViewModel({ id, location_type, updated_at, user_id, created_at, position_title, date_applied, url, compensation, status, comments }: ApplicationModel): IApplicationNestedViewModel {
 		return {
 			id,
 			url,
 			compensation,
+			locationType: location_type,
 			status: getStatusFromApplied(status, date_applied),
 			userId: user_id,
 			site: this.urlToSite(url),
@@ -112,6 +124,7 @@ export class ApplicationsMapper implements OnModuleInit {
 			compensation,
 			positionTitle,
 			userId,
+			locationType: EnumLocationTypes.Remote,
 			comments: comments ? comments.split(/\r\n|\n|\r/g).map((comment) => {
 				return {
 					userId,
@@ -130,12 +143,13 @@ export class ApplicationsMapper implements OnModuleInit {
 		};
 	}
 
-	viewModelToEntity({ id, compensation, userId, company, status, url, positionTitle, dateApplied }: IApplicationUpdateViewModel): IApplicationUpdateModel {
+	viewModelToEntity({ id, compensation, userId, company, status, url, positionTitle, dateApplied, locationType }: IApplicationUpdateViewModel): IApplicationUpdateModel {
 		return {
 			id,
 			compensation,
 			status,
 			url,
+			location_type: locationType,
 			user_id: userId ?? this.authStorageService.getUserId(),
 			position_title: positionTitle,
 			date_applied: dateApplied,
@@ -144,11 +158,12 @@ export class ApplicationsMapper implements OnModuleInit {
 		};
 	}
 
-	createViewModelToEntity({ compensation, company, status, url, positionTitle, dateApplied }: IApplicationCreateViewModel, useAppliedDate = false): IApplicationCreateModel {
+	createViewModelToEntity({ compensation, locationType, company, status, url, positionTitle, dateApplied }: IApplicationCreateViewModel, useAppliedDate = false): IApplicationCreateModel {
 		return {
 			compensation,
 			status,
 			url,
+			location_type: locationType,
 			user_id: this.authStorageService.getUserId(),
 			created_at: useAppliedDate ? new Date(dateApplied) : undefined,
 			position_title: positionTitle,

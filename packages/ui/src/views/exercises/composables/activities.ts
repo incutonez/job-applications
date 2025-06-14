@@ -1,8 +1,9 @@
 ﻿import { computed, inject, type InjectionKey, provide, type Ref, ref, toRaw, unref, watch } from "vue";
 import {
-	EnumActivitySource, type ExerciseActivityAttributeViewModel,
-	type ExerciseActivityCreateViewModel,
-	type ExerciseActivityViewModel, type StravaTokenViewModel,
+	type ActivityAttributeViewModel,
+	type ActivityCreateViewModel,
+	type ActivityViewModel,
+	EnumActivitySource, type StravaTokenViewModel,
 } from "@incutonez/life-stats-spec";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/vue-query";
 import clone from "just-clone";
@@ -77,7 +78,7 @@ export function useDeleteActivity() {
 	const deletingRecord = ref(false);
 	const queryClient = useQueryClient();
 	const deleteMutation = useMutation({
-		async mutationFn(record: ExerciseActivityViewModel) {
+		async mutationFn(record: ActivityViewModel) {
 			return ActivitiesAPI.deleteActivity(record.id);
 		},
 		async onSuccess() {
@@ -85,7 +86,7 @@ export function useDeleteActivity() {
 		},
 	});
 
-	async function deleteRecord(record?: ExerciseActivityViewModel) {
+	async function deleteRecord(record?: ActivityViewModel) {
 		if (record) {
 			deletingRecord.value = true;
 			await deleteMutation.mutateAsync(record);
@@ -130,11 +131,11 @@ export function useImportActivities() {
 }
 
 export function useUploadActivities() {
-	const addedRecords = ref<ExerciseActivityCreateViewModel[]>([]);
+	const addedRecords = ref<ActivityCreateViewModel[]>([]);
 	const addingRecords = ref(false);
 	const added = ref(false);
 	const updateMutation = useMutation({
-		async mutationFn(records: ExerciseActivityCreateViewModel[]) {
+		async mutationFn(records: ActivityCreateViewModel[]) {
 			addingRecords.value = true;
 			await ActivitiesAPI.uploadStravaActivities(records, {
 				// Set a 2 minute timeout, just in case it's a very large upload
@@ -205,13 +206,13 @@ export function useListExercisesHistory() {
 export function provideActivityRecord(recordId: Ref<string>) {
 	const updated = ref(false);
 	const savingRecord = ref(false);
-	const viewRecord = ref<ExerciseActivityViewModel>();
-	const selectedAttributeRecord = ref<ExerciseActivityAttributeViewModel>();
+	const viewRecord = ref<ActivityViewModel>();
+	const selectedAttributeRecord = ref<ActivityAttributeViewModel>();
 	const attributeRecords = computed(() => viewRecord.value?.attributes ?? []);
 	const isEdit = computed(() => !!viewRecord.value?.id);
 	const query = useQuery({
 		queryKey: [QueryKeyActivity, recordId],
-		async queryFn(): Promise<ExerciseActivityViewModel> {
+		async queryFn(): Promise<ActivityViewModel> {
 			const $recordId = unref(recordId);
 			if ($recordId === RouteCreate) {
 				// Default model

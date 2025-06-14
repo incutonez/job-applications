@@ -115,7 +115,7 @@ function onClickCell(cell: ITableCell<TData>) {
 </script>
 
 <template>
-	<article class="overflow-auto size-full border-x border-y">
+	<article class="overflow-auto size-full border">
 		<table
 			class="border-spacing-0 border-separate w-full"
 			:class="tableCls"

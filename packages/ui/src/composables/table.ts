@@ -115,6 +115,18 @@ export function useTableActions<T>(buttons: ITableAction<T>[]): ITableColumn<T> 
 	};
 }
 
+export function useRowNumbering<T>(): ITableColumn<T> {
+	return {
+		accessorKey: "id",
+		header: "Row",
+		cell: (info) => parseInt(info.row.id) + 1,
+		meta: {
+			columnWidth: "min-w-auto",
+			columnAlign: "center",
+		},
+	};
+}
+
 export function useDateColumn<T>(accessorKey: string, header: string, width = "min-w-28 w-28"): ITableColumn<T> {
 	return {
 		accessorKey,

@@ -1,8 +1,8 @@
 ﻿import { Inject, Injectable } from "@nestjs/common";
 import { SessionStorageService } from "@/auth/session.storage.service";
 import { SESSION_STORAGE } from "@/constants";
-import { ICommentCreateModel, ICommentModel } from "@/db/models/CommentModel";
-import { ICommentCreateViewModel, ICommentViewModel } from "@/viewModels/comment.viewmodel";
+import { ICommentCreateModel, ICommentModel } from "@/jobs/models/CommentModel";
+import { ICommentCreateViewModel, ICommentViewModel } from "@/jobs/viewModels/comment.viewmodel";
 
 @Injectable()
 export class CommentsMapper {

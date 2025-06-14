@@ -3,14 +3,14 @@ import { h, toRef } from "vue";
 import {
 	type AuditDiffViewModel,
 	type AuditViewModel,
-	EnumAuditActionTypes,
+	EnumAuditActionTypes, EnumTableNames,
 } from "@incutonez/life-stats-spec";
 import type { CellContext } from "@tanstack/vue-table";
 import TableData from "@/components/TableData.vue";
 import TablePagination from "@/components/TablePagination.vue";
 import { useDateCreatedColumn, useExpandableRow, useTableData, useUserNameColumn } from "@/composables/table.ts";
 import type { ISubRowRenderer, ITableColumn, ITableData } from "@/types/components.ts";
-import { capitalize, isDefined, isObject } from "@/utils/common.ts";
+import { capitalize, getEnumDisplay, isDefined, isObject } from "@/utils/common.ts";
 import AuditDiff from "@/views/featureHistory/AuditDiff.vue";
 
 export interface IViewFeatureHistoryProps {
@@ -49,6 +49,7 @@ const { table, search } = useTableData<AuditViewModel>({
 		}, {
 			accessorKey: "entity",
 			header: "Entity",
+			cell: (info) => getEnumDisplay(EnumTableNames, info.getValue<number>()),
 		}, {
 			accessorKey: "entityId",
 			header: "Entity ID",

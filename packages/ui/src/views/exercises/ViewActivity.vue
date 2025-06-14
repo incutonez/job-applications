@@ -1,6 +1,6 @@
 ﻿<script setup lang="ts">
 import { computed, ref, unref, watch } from "vue";
-import { type ExerciseActivityAttributeViewModel } from "@incutonez/life-stats-spec";
+import { type ActivityAttributeViewModel } from "@incutonez/life-stats-spec";
 import clone from "just-clone";
 import BaseButton from "@/components/BaseButton.vue";
 import BaseDialog from "@/components/BaseDialog.vue";
@@ -37,7 +37,7 @@ const { save, savingRecord, viewRecord, isEdit, selectedAttributeRecord, attribu
 const { viewActivities } = useExerciseRoutes();
 const { userProfile } = injectUserProfile();
 const dialogTitle = computed(() => isEdit.value ? "Edit Activity" : "Create Activity");
-const attributesTable = useTableData<ExerciseActivityAttributeViewModel>({
+const attributesTable = useTableData<ActivityAttributeViewModel>({
 	data: attributeRecords,
 	sortInitial: [{
 		desc: false,

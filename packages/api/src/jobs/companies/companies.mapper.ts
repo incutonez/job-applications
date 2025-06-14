@@ -1,8 +1,8 @@
 ﻿import { Injectable, OnModuleInit } from "@nestjs/common";
 import { ModuleRef } from "@nestjs/core";
-import { CompanyModel } from "@/db/models/CompanyModel";
 import { ApplicationsMapper } from "@/jobs/applications/applications.mapper";
-import { CompanyFullViewModel, CompanyViewModel } from "@/viewModels/company.viewmodel";
+import { CompanyModel } from "@/jobs/models/CompanyModel";
+import { CompanyFullViewModel, CompanyViewModel } from "@/jobs/viewModels/company.viewmodel";
 
 @Injectable()
 export class CompaniesMapper implements OnModuleInit {

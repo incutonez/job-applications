@@ -1,6 +1,6 @@
 ﻿<script setup lang="ts">
 import { ref } from "vue";
-import { type ExerciseActivityCreateViewModel } from "@incutonez/life-stats-spec";
+import { type ActivityCreateViewModel } from "@incutonez/life-stats-spec";
 import MimeTypes from "mime-types";
 import BaseButton from "@/components/BaseButton.vue";
 import BaseDialog from "@/components/BaseDialog.vue";
@@ -18,7 +18,7 @@ const showingImport = ref(true);
 const dialogCmp = ref<InstanceType<typeof BaseDialog>>();
 const { importFile, uploadFile, uploadingFile } = useImportActivities();
 const { addedRecords, addingRecords, createApplications } = useUploadActivities();
-const { table, search } = useTableData<ExerciseActivityCreateViewModel>({
+const { table, search } = useTableData<ActivityCreateViewModel>({
 	data: addedRecords,
 	paginated: true,
 	columns: [useTableActions([{

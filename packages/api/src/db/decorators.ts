@@ -1,7 +1,7 @@
 import { DataTypes } from "@sequelize/core";
 import { Attribute, Table } from "@sequelize/core/decorators-legacy";
 import { uuid } from "uuidv4";
-import { CreatedAtField, EnumTableNames, UpdatedAtField } from "@/constants";
+import { CreatedAtField, EnumTableNames, getTableName, UpdatedAtField } from "@/constants";
 
 export function PrimaryKeyGuid() {
 	return Attribute({
@@ -12,11 +12,23 @@ export function PrimaryKeyGuid() {
 	});
 }
 
-export function BaseTable(tableName: EnumTableNames) {
+export interface IBaseTable {
+	tableName: EnumTableNames;
+	createdAt?: typeof CreatedAtField | false;
+	updatedAt?: typeof UpdatedAtField | false;
+}
+
+export function BaseTable(options: EnumTableNames | IBaseTable) {
+	if (typeof options === "number") {
+		options = {
+			tableName: options,
+		};
+	}
+	const { tableName, createdAt = CreatedAtField, updatedAt = UpdatedAtField } = options;
 	return Table({
-		tableName,
-		createdAt: CreatedAtField,
-		updatedAt: UpdatedAtField,
+		tableName: getTableName(tableName),
+		createdAt,
+		updatedAt,
 	});
 }
 

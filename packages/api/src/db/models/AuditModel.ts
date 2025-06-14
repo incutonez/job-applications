@@ -1,14 +1,13 @@
 ﻿import { DataTypes, Model } from "@sequelize/core";
-import { Attribute, Table } from "@sequelize/core/decorators-legacy";
-import { CreatedAtField, EnumAuditActionTypes, EnumFeatures, EnumTableNames } from "@/constants";
-import { AttributeEnum, PrimaryKeyGuid } from "@/db/decorators";
+import { Attribute } from "@sequelize/core/decorators-legacy";
+import { EnumAuditActionTypes, EnumFeatures, EnumTableNames } from "@/constants";
+import { AttributeEnum, BaseTable, PrimaryKeyGuid } from "@/db/decorators";
 import { ModelInterface } from "@/types";
 
 export type IAuditModel = ModelInterface<AuditModel>;
 
-@Table({
-	tableName: EnumTableNames.Audits,
-	createdAt: CreatedAtField,
+@BaseTable({
+	tableName: EnumTableNames.audits,
 	updatedAt: false,
 })
 export class AuditModel extends Model {
@@ -18,7 +17,7 @@ export class AuditModel extends Model {
 	@Attribute(DataTypes.STRING)
 	declare user_id: string;
 
-	@Attribute(DataTypes.ENUM(Object.values(EnumTableNames)))
+	@AttributeEnum(EnumTableNames)
 	declare entity: EnumTableNames;
 
 	@Attribute(DataTypes.STRING)

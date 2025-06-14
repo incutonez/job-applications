@@ -1,9 +1,9 @@
 ﻿import { Inject, Injectable } from "@nestjs/common";
 import { SessionStorageService } from "@/auth/session.storage.service";
 import { SESSION_STORAGE } from "@/constants";
-import { CompanyModel } from "@/db/models/CompanyModel";
 import { CompaniesMapper } from "@/jobs/companies/companies.mapper";
-import { CompanyFullListViewModel, CompanyListViewModel } from "@/viewModels/company.viewmodel";
+import { CompanyModel } from "@/jobs/models/CompanyModel";
+import { CompanyFullListViewModel, CompanyListViewModel } from "@/jobs/viewModels/company.viewmodel";
 
 @Injectable()
 export class CompaniesService {

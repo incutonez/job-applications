@@ -1,31 +1,31 @@
 ﻿import { Injectable } from "@nestjs/common";
 import { AttributeTypesService } from "@/attributeTypes/attributeTypes.service";
-import {
-	ExerciseActivityAttributeModel,
-	IExerciseActivityAttributeCreate,
-} from "@/db/models/ExerciseActivityAttributeModel";
-import {
-	ExerciseActivityModel,
-	IExerciseActivityCreate,
-} from "@/db/models/ExerciseActivityModel";
-import {
-	ExerciseActivityTypesModel,
-	IExerciseActivityTypeCreate,
-} from "@/db/models/ExerciseActivityTypesModel";
 import { ActivitiesMapper } from "@/exercises/activities/activities.mapper";
 import {
-	ExerciseActivityCreateViewModel,
-	ExerciseActivityListViewModel,
-	IExerciseActivityViewModel,
-} from "@/viewModels/exercises/exercise.activity.viewmodel";
+	ActivityAttributeModel,
+	IActivityAttributeCreate,
+} from "@/exercises/models/ActivityAttributeModel";
+import {
+	ActivityModel,
+	IActivityCreate,
+} from "@/exercises/models/ActivityModel";
+import {
+	ActivityTypeModel,
+	IActivityTypeCreate,
+} from "@/exercises/models/ActivityTypeModel";
+import {
+	ActivityCreateViewModel,
+	ActivityListViewModel,
+	IActivityViewModel,
+} from "@/exercises/viewModels/activity.viewmodel";
 
 @Injectable()
 export class ActivitiesService {
 	constructor(private mapper: ActivitiesMapper, private readonly attributeTypesService: AttributeTypesService) {
 	}
 
-	async listActivities(): Promise<ExerciseActivityListViewModel> {
-		const { rows, count } = await ExerciseActivityModel.findAndCountAll({
+	async listActivities(): Promise<ActivityListViewModel> {
+		const { rows, count } = await ActivityModel.findAndCountAll({
 			include: [{
 				association: "attributes",
 				include: [{
@@ -41,8 +41,8 @@ export class ActivitiesService {
 		};
 	}
 
-	async createActivityType({ name, user_id }: IExerciseActivityTypeCreate) {
-		const [entity] = await ExerciseActivityTypesModel.findOrCreate({
+	async createActivityType({ name, user_id }: IActivityTypeCreate) {
+		const [entity] = await ActivityTypeModel.findOrCreate({
 			where: {
 				name,
 			},
@@ -54,19 +54,19 @@ export class ActivitiesService {
 		return this.mapper.entityActivityTypeToViewModel(entity);
 	}
 
-	async createActivityAttribute(model: IExerciseActivityAttributeCreate, activityId: string) {
+	async createActivityAttribute(model: IActivityAttributeCreate, activityId: string) {
 		const attributeType = await this.attributeTypesService.createAttributeTypeRaw(model.attribute_type);
 		model.attribute_type_id = attributeType.id;
 		model.activity_id = activityId;
-		return ExerciseActivityAttributeModel.create(model);
+		return ActivityAttributeModel.create(model);
 	}
 
-	async createActivityEntity(model: IExerciseActivityCreate) {
-		return ExerciseActivityModel.create(model);
+	async createActivityEntity(model: IActivityCreate) {
+		return ActivityModel.create(model);
 	}
 
 	async getActivityRaw(id: string) {
-		return ExerciseActivityModel.findByPk(id, {
+		return ActivityModel.findByPk(id, {
 			include: [{
 				all: true,
 				nested: true,
@@ -82,11 +82,11 @@ export class ActivitiesService {
 	}
 
 	async getActivityTypes(addMeta = false) {
-		const entities = await ExerciseActivityTypesModel.findAll();
+		const entities = await ActivityTypeModel.findAll();
 		return entities.map((entity) => this.mapper.entityActivityTypeToViewModel(entity, addMeta));
 	}
 
-	async updateActivity(viewModel: IExerciseActivityViewModel) {
+	async updateActivity(viewModel: IActivityViewModel) {
 		const record = await this.getActivityRaw(viewModel.id);
 		if (record) {
 			const { attributes = [] } = record;
@@ -119,7 +119,7 @@ export class ActivitiesService {
 	}
 
 	async deleteActivity(id: string) {
-		return ExerciseActivityModel.destroy({
+		return ActivityModel.destroy({
 			where: {
 				id,
 			},
@@ -127,12 +127,12 @@ export class ActivitiesService {
 		});
 	}
 
-	async createActivityWithResponse(viewModel: ExerciseActivityCreateViewModel) {
+	async createActivityWithResponse(viewModel: ActivityCreateViewModel) {
 		const activityId = await this.createActivity(viewModel);
 		return this.getActivity(activityId);
 	}
 
-	async createActivity(viewModel: ExerciseActivityCreateViewModel) {
+	async createActivity(viewModel: ActivityCreateViewModel) {
 		const model = this.mapper.viewModelCreateToEntity(viewModel);
 		const activityType = await this.createActivityType(model.activity_type);
 		model.activity_type_id = activityType.id;

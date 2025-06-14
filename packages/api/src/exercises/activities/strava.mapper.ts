@@ -4,22 +4,22 @@ import { EnumUnitTypes, PoundToCalories, SecondsInHour, SESSION_STORAGE } from "
 import { ActivitiesMapper } from "@/exercises/activities/activities.mapper";
 import { calculateCalories, EnumActivitySource } from "@/exercises/constants";
 import { IStravaActivity, IStravaImport } from "@/exercises/types";
+import { IActivityAttributeCreateViewModel } from "@/exercises/viewModels/activity.attribute.viewmodel";
+import { IActivityCreateViewModel	 } from "@/exercises/viewModels/activity.viewmodel";
 import { dateToUTC } from "@/utils";
-import { IExerciseActivityAttributeCreateViewModel } from "@/viewModels/exercises/exercise.activity.attribute.viewmodel";
-import { IExerciseActivityCreateViewModel	 } from "@/viewModels/exercises/exercise.activity.viewmodel";
 
 @Injectable()
 export class StravaMapper {
 	constructor(@Inject(SESSION_STORAGE) private readonly storage: SessionStorageService, private readonly activitiesMapper: ActivitiesMapper) {
 	}
 
-	apiToViewModel(entity: IStravaActivity): IExerciseActivityCreateViewModel {
+	apiToViewModel(entity: IStravaActivity): IActivityCreateViewModel {
 		const userId = this.storage.getUserId();
 		const activityType = entity.type;
 		const duration = entity.moving_time / SecondsInHour;
 		const weight = this.storage.getUserSettings().exercises.weight ?? 200;
 		const calories = calculateCalories(activityType, duration, weight);
-		const attributes: (IExerciseActivityAttributeCreateViewModel | undefined)[] = [
+		const attributes: (IActivityAttributeCreateViewModel | undefined)[] = [
 			this.activitiesMapper.stubAttribute(entity.elapsed_time.toString(), "Duration Total", {
 				unit: EnumUnitTypes.Seconds,
 				unitConversion: EnumUnitTypes.Hours,
@@ -65,13 +65,13 @@ export class StravaMapper {
 		};
 	}
 
-	importToViewModel(entity: IStravaImport): IExerciseActivityCreateViewModel {
+	importToViewModel(entity: IStravaImport): IActivityCreateViewModel {
 		const userId = this.storage.getUserId();
 		const activityType = entity["Activity Type"];
 		const duration = parseFloat(entity["Moving Time"]) / SecondsInHour;
 		const weight = this.storage.getUserSettings().exercises.weight ?? 200;
 		const calories = calculateCalories(activityType, duration, weight);
-		const attributes: (IExerciseActivityAttributeCreateViewModel | undefined)[] = [
+		const attributes: (IActivityAttributeCreateViewModel | undefined)[] = [
 			// Time should be stored in seconds
 			this.activitiesMapper.stubAttribute(entity["Elapsed Time"], "Duration Total", {
 				unit: EnumUnitTypes.Seconds,

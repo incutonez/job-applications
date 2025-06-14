@@ -1,4 +1,9 @@
-﻿import { type ApplicationViewModel, EnumApplicationStatus, EnumFeatures } from "@incutonez/life-stats-spec";
+﻿import {
+	type ApplicationViewModel,
+	EnumApplicationStatus,
+	EnumFeatures,
+	EnumLocationTypes,
+} from "@incutonez/life-stats-spec";
 import MimeTypes from "mime-types";
 import PapaParse from "papaparse";
 import { v4 } from "uuid";
@@ -65,7 +70,7 @@ export function capitalize(value: string) {
 }
 
 export function splitPascal(value: string) {
-	return value.split(CapitalizeWordBoundary).join(" ");
+	return capitalize(value.split(CapitalizeWordBoundary).join(" "));
 }
 
 export function isObject(value: unknown) {
@@ -119,6 +124,7 @@ export function pasteToApplicationViewModel(value: string) {
 		id: "",
 		site: "",
 		status: EnumApplicationStatus.Applied,
+		locationType: EnumLocationTypes.Remote,
 		userId: "",
 		company: {
 			id: getUniqueId(),

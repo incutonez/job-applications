@@ -14,8 +14,8 @@ import { ApiBody, ApiConsumes, ApiOkResponse, ApiTags } from "@nestjs/swagger";
 import { UseValidationPipe } from "@/constants";
 import { ApplicationsService } from "@/jobs/applications/applications.service";
 import { ApplicationsUploadViewModel } from "@/jobs/applications/types";
+import { ApplicationViewModel, IApplicationCreateViewModel } from "@/jobs/viewModels/application.viewmodel";
 import { IUploadViewModelsResponse } from "@/types";
-import { ApplicationViewModel, IApplicationCreateViewModel } from "@/viewModels/application.viewmodel";
 import { ApiPaginatedRequest } from "@/viewModels/base.list.viewmodel";
 
 @ApiTags("applications")

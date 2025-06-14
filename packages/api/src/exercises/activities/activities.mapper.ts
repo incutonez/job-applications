@@ -2,32 +2,32 @@
 import { AttributeTypesMapper } from "@/attributeTypes/attributeTypes.mapper";
 import { SessionStorageService } from "@/auth/session.storage.service";
 import { EnumFeatures, SESSION_STORAGE } from "@/constants";
-import {
-	IExerciseActivityAttributeCreate,
-	IExerciseActivityAttributeModel,
-} from "@/db/models/ExerciseActivityAttributeModel";
-import {
-	IExerciseActivityCreate,
-	IExerciseActivityModel,
-	IExerciseActivityUpdateModel,
-} from "@/db/models/ExerciseActivityModel";
-import { IExerciseActivityTypeCreate, IExerciseActivityTypesModel } from "@/db/models/ExerciseActivityTypesModel";
 import { EnumActivitySource } from "@/exercises/constants";
-import { IStubAttributeOptions } from "@/exercises/types";
-import { addMetaInfo, convertToUnit, localizeValue } from "@/utils";
-import { IExerciseActivityAttributeCreateViewModel, IExerciseActivityAttributeViewModel } from "@/viewModels/exercises/exercise.activity.attribute.viewmodel";
 import {
-	IExerciseActivityTypeCreateViewModel,
-	IExerciseActivityTypeViewModel,
-} from "@/viewModels/exercises/exercise.activity.type.viewmodel";
-import { IExerciseActivityCreateViewModel,	IExerciseActivityViewModel } from "@/viewModels/exercises/exercise.activity.viewmodel";
+	IActivityAttributeCreate,
+	IActivityAttributeModel,
+} from "@/exercises/models/ActivityAttributeModel";
+import {
+	IActivityCreate,
+	IActivityModel,
+	IActivityUpdateModel,
+} from "@/exercises/models/ActivityModel";
+import { IActivityTypeCreate, IActivityTypeModel } from "@/exercises/models/ActivityTypeModel";
+import { IStubAttributeOptions } from "@/exercises/types";
+import { IActivityAttributeCreateViewModel, IActivityAttributeViewModel } from "@/exercises/viewModels/activity.attribute.viewmodel";
+import {
+	IActivityTypeCreateViewModel,
+	IActivityTypeViewModel,
+} from "@/exercises/viewModels/activity.type.viewmodel";
+import { IActivityCreateViewModel,	IActivityViewModel } from "@/exercises/viewModels/activity.viewmodel";
+import { addMetaInfo, convertToUnit, localizeValue } from "@/utils";
 
 @Injectable()
 export class ActivitiesMapper {
 	constructor(@Inject(SESSION_STORAGE) private readonly storage: SessionStorageService, private readonly attributeTypesMapper: AttributeTypesMapper) {
 	}
 
-	stubAttribute(value: string | undefined, field: string, { unit, unitConversion }: IStubAttributeOptions = {}): IExerciseActivityAttributeCreateViewModel | undefined {
+	stubAttribute(value: string | undefined, field: string, { unit, unitConversion }: IStubAttributeOptions = {}): IActivityAttributeCreateViewModel | undefined {
 		if (value) {
 			const userId = this.storage.getUserId();
 			const convertedValue = convertToUnit({
@@ -53,7 +53,7 @@ export class ActivitiesMapper {
 		return undefined;
 	}
 
-	entityToViewModel({ id, user_id, calories, weight_lost, duration, weight, source_id, title, activity_type, created_at, updated_at, attributes = [], source, description, date_occurred }: IExerciseActivityModel, addMeta = true): IExerciseActivityViewModel {
+	entityToViewModel({ id, user_id, calories, weight_lost, duration, weight, source_id, title, activity_type, created_at, updated_at, attributes = [], source, description, date_occurred }: IActivityModel, addMeta = true): IActivityViewModel {
 		const response = {
 			id,
 			source,
@@ -74,13 +74,13 @@ export class ActivitiesMapper {
 		return response;
 	}
 
-	entityActivityAttributeToViewModel({ id, attribute_type, activity, unit_display, user_id, created_at, updated_at, value, unit }: IExerciseActivityAttributeModel, addMeta = false) {
+	entityActivityAttributeToViewModel({ id, attribute_type, activity, unit_display, user_id, created_at, updated_at, value, unit }: IActivityAttributeModel, addMeta = false) {
 		const localizedValue = localizeValue({
 			value,
 			unit,
 			measurementSystem: this.storage.getMeasurementSystem(),
 		});
-		const response: IExerciseActivityAttributeViewModel = {
+		const response: IActivityAttributeViewModel = {
 			id,
 			value: localizedValue.value,
 			unit: localizedValue.unit,
@@ -102,7 +102,7 @@ export class ActivitiesMapper {
 		return response;
 	}
 
-	entityActivityTypeToViewModel({ id, activities, user_id, name, created_at, updated_at }: IExerciseActivityTypesModel, addMeta = false): IExerciseActivityTypeViewModel {
+	entityActivityTypeToViewModel({ id, activities, user_id, name, created_at, updated_at }: IActivityTypeModel, addMeta = false): IActivityTypeViewModel {
 		const response = {
 			id,
 			name,
@@ -114,14 +114,14 @@ export class ActivitiesMapper {
 		return response;
 	}
 
-	viewModelCreateActivityTypeToEntity({ name, userId }: IExerciseActivityTypeCreateViewModel): IExerciseActivityTypeCreate {
+	viewModelCreateActivityTypeToEntity({ name, userId }: IActivityTypeCreateViewModel): IActivityTypeCreate {
 		return {
 			name,
 			user_id: userId ?? this.storage.getUserId(),
 		};
 	}
 
-	viewModelActivityTypeToEntity({ id, name, userId }: IExerciseActivityTypeViewModel): IExerciseActivityTypesModel {
+	viewModelActivityTypeToEntity({ id, name, userId }: IActivityTypeViewModel): IActivityTypeModel {
 		return {
 			id,
 			name,
@@ -129,7 +129,7 @@ export class ActivitiesMapper {
 		};
 	}
 
-	viewModelCreateActivityAttributesToEntity({ value, unit, unitDisplay, userId, attributeType }: IExerciseActivityAttributeCreateViewModel): IExerciseActivityAttributeCreate {
+	viewModelCreateActivityAttributesToEntity({ value, unit, unitDisplay, userId, attributeType }: IActivityAttributeCreateViewModel): IActivityAttributeCreate {
 		const result = localizeValue({
 			value,
 			unit,
@@ -149,7 +149,7 @@ export class ActivitiesMapper {
 		};
 	}
 
-	viewModelActivityAttributeToEntity({ id, value, unit, unitDisplay, activity, userId, attributeType }: IExerciseActivityAttributeViewModel, activityId = activity?.id): IExerciseActivityAttributeModel {
+	viewModelActivityAttributeToEntity({ id, value, unit, unitDisplay, activity, userId, attributeType }: IActivityAttributeViewModel, activityId = activity?.id): IActivityAttributeModel {
 		const result = localizeValue({
 			value,
 			unit,
@@ -168,7 +168,7 @@ export class ActivitiesMapper {
 		};
 	}
 
-	viewModelCreateToEntity({ userId, weight = this.storage.getUserSettings().exercises.weight, duration, source = EnumActivitySource.None, sourceId, activityType, attributes, description, title, dateOccurred }: IExerciseActivityCreateViewModel): IExerciseActivityCreate {
+	viewModelCreateToEntity({ userId, weight = this.storage.getUserSettings().exercises.weight, duration, source = EnumActivitySource.None, sourceId, activityType, attributes, description, title, dateOccurred }: IActivityCreateViewModel): IActivityCreate {
 		const defaultUserId = this.storage.getUserId();
 		sourceId = source === EnumActivitySource.None ? "" : sourceId;
 		return {
@@ -187,7 +187,7 @@ export class ActivitiesMapper {
 		};
 	}
 
-	viewModelToEntity({ id, userId, duration, weight = this.storage.getUserSettings().exercises.weight, source = EnumActivitySource.None, sourceId, activityType, description, title, dateOccurred }: IExerciseActivityViewModel): IExerciseActivityUpdateModel {
+	viewModelToEntity({ id, userId, duration, weight = this.storage.getUserSettings().exercises.weight, source = EnumActivitySource.None, sourceId, activityType, description, title, dateOccurred }: IActivityViewModel): IActivityUpdateModel {
 		const defaultUserId = this.storage.getUserId();
 		sourceId = source === EnumActivitySource.None ? "" : sourceId;
 		return {

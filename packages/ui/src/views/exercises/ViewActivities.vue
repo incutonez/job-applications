@@ -1,6 +1,6 @@
 ﻿<script setup lang="ts">
 import { ref } from "vue";
-import { type ExerciseActivityViewModel } from "@incutonez/life-stats-spec";
+import { type ActivityViewModel } from "@incutonez/life-stats-spec";
 import BaseButton from "@/components/BaseButton.vue";
 import { IconAdd, IconDelete, IconEdit, IconSync } from "@/components/Icons.ts";
 import TableData from "@/components/TableData.vue";
@@ -11,12 +11,12 @@ import { useExerciseRoutes } from "@/views/exercises/composables/routes.ts";
 import { useActivitiesColumns } from "@/views/exercises/composables/table.ts";
 import DeleteDialog from "@/views/shared/DeleteDialog.vue";
 
-const selectedRecord = ref<ExerciseActivityViewModel>();
+const selectedRecord = ref<ActivityViewModel>();
 const showDeleteDialog = ref(false);
 const { data } = useListActivities();
 const { viewStravaSync, viewActivity } = useExerciseRoutes();
 const { deleteRecord, deletingRecord } = useDeleteActivity();
-const { table, search } = useTableData<ExerciseActivityViewModel>({
+const { table, search } = useTableData<ActivityViewModel>({
 	data,
 	paginated: true,
 	columns: [useTableActions([{
@@ -30,7 +30,7 @@ const { table, search } = useTableData<ExerciseActivityViewModel>({
 			selectedRecord.value = record;
 			showDeleteDialog.value = true;
 		},
-	}]), ...useActivitiesColumns<ExerciseActivityViewModel>()],
+	}]), ...useActivitiesColumns<ActivityViewModel>()],
 	sortInitial: [{
 		desc: true,
 		id: "dateOccurred",

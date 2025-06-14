@@ -9,7 +9,7 @@ export type IAttributeType = ModelInterface<AttributeTypeModel>;
 
 export type IAttributeTypeCreate = Omit<IAttributeType, "id">;
 
-@BaseTable(EnumTableNames.AttributeTypes)
+@BaseTable(EnumTableNames.attributeTypes)
 export class AttributeTypeModel extends BaseModel {
 	@PrimaryKeyGuid()
 	declare id: string;

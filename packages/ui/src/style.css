@@ -39,6 +39,17 @@ input[type=number] {
     -moz-appearance: textfield;
 }
 
+/* Set default border color */
+@layer base {
+    *,
+    ::after,
+    ::before,
+    ::backdrop,
+    ::file-selector-button {
+        border-color: var(--color-gray-500, currentColor);
+    }
+}
+
 @layer components {
     .field-label {
         @apply uppercase font-semibold text-slate-600 text-sm;
@@ -86,14 +97,14 @@ input[type=number] {
     }
     
     .field-checkbox {
-        @apply bg-white hover:bg-sky-100 flex size-5 appearance-none items-center justify-center rounded-md outline-none border border-gray-500;
+        @apply bg-white hover:bg-sky-100 flex size-5 appearance-none items-center justify-center rounded-md outline-none border;
     }
     
     .base-button {
         @apply px-2 py-1 inline-flex cursor-pointer select-none items-center justify-center overflow-hidden relative text-sm transition-colors duration-200 rounded-md disabled:opacity-60 disabled:cursor-not-allowed;
 
         &.button-normal {
-            @apply bg-slate-200 font-semibold enabled:hover:bg-slate-300 enabled:active:bg-slate-200 text-gray-800 border border-gray-500
+            @apply bg-slate-200 font-semibold enabled:hover:bg-slate-300 enabled:active:bg-slate-200 text-gray-800 border
             focus:outline-none focus:outline-offset-0 focus:ring-1 focus:ring-offset-slate-500 focus:ring-offset-1
             focus:ring-slate-400;
         }
@@ -156,5 +167,9 @@ input[type=number] {
         &.button-icon-only {
             @apply p-1;
         }
+    }
+    
+    .base-tab {
+        @apply px-4 py-2 text-gray-800 text-sm bg-gray-200 rounded-t-sm border border-b-0 aria-selected:underline underline-offset-4 decoration-emerald-700 decoration-1 aria-selected:text-emerald-700 border-b-emerald-500 hover:bg-sky-200 cursor-pointer last:border-l-0;
     }
 }

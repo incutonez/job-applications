@@ -1,9 +1,9 @@
 ﻿import { h } from "vue";
 import {
+	type ActivityAttributeViewModel,
+	type ActivityCreateViewModel,
 	EnumActivitySource,
 	EnumUnitTypes,
-	type ExerciseActivityAttributeViewModel,
-	type ExerciseActivityCreateViewModel,
 } from "@incutonez/life-stats-spec";
 import TableData from "@/components/TableData.vue";
 import { useDateColumn, useTableData } from "@/composables/table.ts";
@@ -12,7 +12,7 @@ import { getEnumDisplay } from "@/utils/common.ts";
 import { numberToDisplay } from "@/utils/formatters.ts";
 import CellActivityDetails from "@/views/exercises/CellActivityDetails.vue";
 
-export function useActivitiesColumns<T extends ExerciseActivityCreateViewModel>(): ITableColumn<T>[] {
+export function useActivitiesColumns<T extends ActivityCreateViewModel>(): ITableColumn<T>[] {
 	return [
 		useDateColumn("dateOccurred", "Date"), {
 			accessorKey: "activityType.name",
@@ -62,8 +62,8 @@ export function useActivitiesColumns<T extends ExerciseActivityCreateViewModel>(
 				cellCls: "!p-0 align-top",
 			},
 			cell(info) {
-				const attributes = info.getValue<ExerciseActivityAttributeViewModel[]>();
-				const attributesTable = useTableData<ExerciseActivityAttributeViewModel>({
+				const attributes = info.getValue<ActivityAttributeViewModel[]>();
+				const attributesTable = useTableData<ActivityAttributeViewModel>({
 					data: attributes,
 					sortInitial: [{
 						desc: false,
@@ -71,7 +71,7 @@ export function useActivitiesColumns<T extends ExerciseActivityCreateViewModel>(
 					}],
 					columns: useAttributesColumns(),
 				});
-				return h<ITableData<ExerciseActivityAttributeViewModel>>(TableData, {
+				return h<ITableData<ActivityAttributeViewModel>>(TableData, {
 					table: attributesTable.table,
 					hideHeaders: true,
 					class: "!border-0",
@@ -81,7 +81,7 @@ export function useActivitiesColumns<T extends ExerciseActivityCreateViewModel>(
 	];
 }
 
-export function useAttributesColumns<T extends ExerciseActivityAttributeViewModel>(): ITableColumn<T>[] {
+export function useAttributesColumns<T extends ActivityAttributeViewModel>(): ITableColumn<T>[] {
 	return [{
 		id: "attributeTypeName",
 		accessorKey: "attributeType.name",

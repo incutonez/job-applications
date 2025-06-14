@@ -28,7 +28,7 @@ function onOpenDialog() {
 	<BaseDialog
 		closable
 		:title="`${title} Comment`"
-		class="size-1/2"
+		class="size-3/4"
 		@open="onOpenDialog"
 	>
 		<template #content>

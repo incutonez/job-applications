@@ -17,7 +17,7 @@ export interface IUserSettingsModel {
 	exercises: IUserSettingsExercisesModel;
 }
 
-@BaseTable(EnumTableNames.Users)
+@BaseTable(EnumTableNames.users)
 export class UserModel extends BaseModel {
 	@PrimaryKeyGuid()
 	declare id: string;

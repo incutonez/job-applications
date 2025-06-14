@@ -4,18 +4,18 @@ import axios from "axios";
 import Papa from "papaparse";
 import { SessionStorageService } from "@/auth/session.storage.service";
 import { SESSION_STORAGE } from "@/constants";
-import { ExerciseActivityModel } from "@/db/models/ExerciseActivityModel";
 import { ActivitiesService } from "@/exercises/activities/activities.service";
 import { StravaMapper } from "@/exercises/activities/strava.mapper";
 import { EnumActivitySource } from "@/exercises/constants";
+import { ActivityModel } from "@/exercises/models/ActivityModel";
 import { IStravaActivity, IStravaAuthResponse, IStravaImport } from "@/exercises/types";
+import {
+	ActivityCreateViewModel,
+	IActivityCreateViewModel,
+} from "@/exercises/viewModels/activity.viewmodel";
+import { StravaTokenViewModel } from "@/exercises/viewModels/strava.token.viewmodel";
 import { IUploadViewModelsResponse } from "@/types";
 import { getErrorMessage } from "@/utils";
-import {
-	ExerciseActivityCreateViewModel,
-	IExerciseActivityCreateViewModel,
-} from "@/viewModels/exercises/exercise.activity.viewmodel";
-import { StravaTokenViewModel } from "@/viewModels/exercises/strava.token.viewmodel";
 
 const PerPage = 200;
 
@@ -58,7 +58,7 @@ export class StravaService {
 
 	importActivities(file: Express.Multer.File, source: EnumActivitySource) {
 		const contents = file.buffer.toString("utf8");
-		const results: IExerciseActivityCreateViewModel[] = [];
+		const results: IActivityCreateViewModel[] = [];
 		if (source === EnumActivitySource.Strava) {
 			const { data } = Papa.parse<IStravaImport>(contents, {
 				header: true,
@@ -71,7 +71,7 @@ export class StravaService {
 		return results;
 	}
 
-	async uploadActivities(viewModels: ExerciseActivityCreateViewModel[]) {
+	async uploadActivities(viewModels: ActivityCreateViewModel[]) {
 		const results: IUploadViewModelsResponse = {
 			successful: 0,
 			errors: [],
@@ -107,7 +107,7 @@ export class StravaService {
 
 	async syncActivities(stravaToken: StravaTokenViewModel): Promise<StravaTokenViewModel | undefined> {
 		// Let's find the user's latest strava activity, so we have a starting point for filtering out records from Strava
-		const lastActivity = await ExerciseActivityModel.findOne({
+		const lastActivity = await ActivityModel.findOne({
 			where: {
 				source: EnumActivitySource.Strava,
 				user_id: this.storage.getUserId(),
@@ -117,7 +117,7 @@ export class StravaService {
 		const response = await this.getUserAccessToken(stravaToken);
 		if (response) {
 			let page = 1;
-			const allRecords: IExerciseActivityCreateViewModel[] = [];
+			const allRecords: IActivityCreateViewModel[] = [];
 			let hasMoreRecord = true;
 			/**
 			 * The API just says "epoch timestamp" but this must be in seconds...

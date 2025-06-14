@@ -1,14 +1,10 @@
-﻿import { CreatedAtField, EnumAuditActionTypes, EnumFeatures, UpdatedAtField } from "@/constants";
-import { ApplicationModel } from "@/db/models/ApplicationModel";
+﻿import { CreatedAtField, EnumAuditActionTypes, EnumFeatures, EnumTableNames, UpdatedAtField } from "@/constants";
 import { AttributeTypeModel } from "@/db/models/AttributeTypeModel";
 import { AuditModel } from "@/db/models/AuditModel";
 import { BaseModel } from "@/db/models/BaseModel";
-import { CommentModel } from "@/db/models/CommentModel";
-import { CompanyModel } from "@/db/models/CompanyModel";
-import { ExerciseActivityAttributeModel } from "@/db/models/ExerciseActivityAttributeModel";
-import { ExerciseActivityModel } from "@/db/models/ExerciseActivityModel";
-import { ExerciseActivityTypesModel } from "@/db/models/ExerciseActivityTypesModel";
 import { UserModel } from "@/db/models/UserModel";
+import { ExerciseModels } from "@/exercises/models";
+import { JobModels } from "@/jobs/models";
 import { isObject } from "@/utils";
 
 export interface IAuditFeatures {
@@ -18,8 +14,6 @@ export interface IAuditFeatures {
 }
 
 export const SystemModels = [UserModel, AttributeTypeModel];
-export const JobModels = [ApplicationModel, CommentModel, CompanyModel];
-export const ExerciseModels = [ExerciseActivityModel, ExerciseActivityAttributeModel, ExerciseActivityTypesModel];
 export const AuditedFeatures: IAuditFeatures[] = [{
 	models: JobModels,
 	feature: EnumFeatures.jobs,
@@ -78,13 +72,14 @@ export function addAuditing() {
 	AuditedFeatures.forEach(({ models, feature, primaryKey = "id" }) => {
 		models.forEach((model) => {
 			const table_name = model.modelDefinition.table.tableName;
+			const entity = EnumTableNames[table_name as keyof typeof EnumTableNames];
 			model.hooks.addListeners({
 				async afterCreate(instance: BaseModel, { transaction }) {
 					const { value_current } = getChanges(instance);
 					await AuditModel.create({
 						value_current,
 						feature,
-						entity: table_name,
+						entity,
 						entity_id: instance.get(primaryKey),
 						user_id: instance.user_id,
 						action: EnumAuditActionTypes.created,
@@ -100,7 +95,7 @@ export function addAuditing() {
 							value_previous,
 							value_current,
 							feature,
-							entity: table_name,
+							entity,
 							entity_id: instance.get(primaryKey),
 							user_id: instance.user_id,
 							action: EnumAuditActionTypes.updated,
@@ -114,7 +109,7 @@ export function addAuditing() {
 					await AuditModel.create({
 						table_name,
 						feature,
-						entity: table_name,
+						entity,
 						entity_id: instance.get(primaryKey),
 						value_previous: value_current,
 						user_id: instance.user_id,

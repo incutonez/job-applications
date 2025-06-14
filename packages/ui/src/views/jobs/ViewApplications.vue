@@ -10,7 +10,7 @@ import { injectGlobalError } from "@/composables/app.ts";
 import {
 	useDateCreatedColumn,
 	useDateUpdatedColumn,
-	useExpandableRow,
+	useExpandableRow, useRowNumbering,
 	useTableActions,
 	useTableData,
 } from "@/composables/table.ts";
@@ -54,6 +54,7 @@ const { table, search } = useTableData<ApplicationViewModel>({
 	}],
 });
 columns.value = [
+	useRowNumbering(),
 	useExpandableRow(),
 	useTableActions([{
 		icon: IconEdit,

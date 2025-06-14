@@ -15,6 +15,9 @@
 
 // May contain unused imports in some cases
 // @ts-ignore
+import { ApplicationLinkViewModel } from './application-link-view-model';
+// May contain unused imports in some cases
+// @ts-ignore
 import { CommentViewModel } from './comment-view-model';
 // May contain unused imports in some cases
 // @ts-ignore
@@ -22,6 +25,9 @@ import { CompanyViewModel } from './company-view-model';
 // May contain unused imports in some cases
 // @ts-ignore
 import { EnumApplicationStatus } from './enum-application-status';
+// May contain unused imports in some cases
+// @ts-ignore
+import { EnumLocationTypes } from './enum-location-types';
 
 /**
  * 
@@ -53,6 +59,12 @@ export interface ApplicationViewModel {
      * @memberof ApplicationViewModel
      */
     'status': EnumApplicationStatus;
+    /**
+     * 
+     * @type {EnumLocationTypes}
+     * @memberof ApplicationViewModel
+     */
+    'locationType': EnumLocationTypes;
     /**
      * 
      * @type {string}
@@ -101,6 +113,12 @@ export interface ApplicationViewModel {
      * @memberof ApplicationViewModel
      */
     'comments': Array<CommentViewModel>;
+    /**
+     * 
+     * @type {Array<ApplicationLinkViewModel>}
+     * @memberof ApplicationViewModel
+     */
+    'links'?: Array<ApplicationLinkViewModel>;
 }
 
 

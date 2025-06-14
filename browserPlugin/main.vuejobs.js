@@ -1,5 +1,5 @@
 const ParentCard = ".transition-all";
-const LastCompany = "Curotec";
+const LastCompany = "Kleer and Membersy";
 let found = false;
 
 function docReady(fn) {

@@ -16,13 +16,13 @@ import { ActivitiesService } from "@/exercises/activities/activities.service";
 import { StravaService } from "@/exercises/activities/strava.service";
 import { EnumActivitySource } from "@/exercises/constants";
 import { ExerciseActivityUpload } from "@/exercises/types";
-import { IUploadViewModelsResponse } from "@/types";
-import { ExerciseActivityTypeViewModel } from "@/viewModels/exercises/exercise.activity.type.viewmodel";
+import { ActivityTypeViewModel } from "@/exercises/viewModels/activity.type.viewmodel";
 import {
-	ExerciseActivityCreateViewModel,
-	ExerciseActivityViewModel, IExerciseActivityCreateViewModel,
-} from "@/viewModels/exercises/exercise.activity.viewmodel";
-import { StravaTokenViewModel } from "@/viewModels/exercises/strava.token.viewmodel";
+	ActivityCreateViewModel,
+	ActivityViewModel, IActivityCreateViewModel,
+} from "@/exercises/viewModels/activity.viewmodel";
+import { StravaTokenViewModel } from "@/exercises/viewModels/strava.token.viewmodel";
+import { IUploadViewModelsResponse } from "@/types";
 
 @ApiTags("activities")
 @Controller("activities")
@@ -41,18 +41,18 @@ export class ActivitiesController {
 	@UseInterceptors(FileInterceptor("file"))
 	@HttpCode(HttpStatus.OK)
 	@ApiOkResponse({
-		type: [ExerciseActivityCreateViewModel],
+		type: [ActivityCreateViewModel],
 	})
-	async importStravaActivities(@Body() _body: ExerciseActivityUpload, @UploadedFile("file") file: Express.Multer.File): Promise<IExerciseActivityCreateViewModel[]> {
+	async importStravaActivities(@Body() _body: ExerciseActivityUpload, @UploadedFile("file") file: Express.Multer.File): Promise<IActivityCreateViewModel[]> {
 		return this.stravaService.importActivities(file, EnumActivitySource.Strava);
 	}
 
 	@Post("strava/upload")
 	@ApiBody({
-		type: [ExerciseActivityCreateViewModel],
+		type: [ActivityCreateViewModel],
 	})
 	@UseValidationPipe()
-	async uploadStravaActivities(@Body() models: ExerciseActivityCreateViewModel[]): Promise<IUploadViewModelsResponse> {
+	async uploadStravaActivities(@Body() models: ActivityCreateViewModel[]): Promise<IUploadViewModelsResponse> {
 		return this.stravaService.uploadActivities(models);
 	}
 
@@ -63,13 +63,13 @@ export class ActivitiesController {
 	}
 
 	@Get("activity-types")
-	async getActivityTypes(): Promise<ExerciseActivityTypeViewModel[]> {
+	async getActivityTypes(): Promise<ActivityTypeViewModel[]> {
 		return this.service.getActivityTypes();
 	}
 
 	@Post("")
 	@UseValidationPipe()
-	async createActivity(@Body() viewModel: ExerciseActivityCreateViewModel): Promise<ExerciseActivityViewModel> {
+	async createActivity(@Body() viewModel: ActivityCreateViewModel): Promise<ActivityViewModel> {
 		const response = await this.service.createActivityWithResponse(viewModel);
 		if (response) {
 			return response;
@@ -78,7 +78,7 @@ export class ActivitiesController {
 	}
 
 	@Get(":activityId")
-	async getActivity(@Param("activityId") activityId: string): Promise<ExerciseActivityViewModel> {
+	async getActivity(@Param("activityId") activityId: string): Promise<ActivityViewModel> {
 		const response = await this.service.getActivity(activityId);
 		if (response) {
 			return response;
@@ -88,7 +88,7 @@ export class ActivitiesController {
 
 	@Put(":activityId")
 	@UseValidationPipe()
-	async updateActivity(@Param("activityId") _activityId: string, @Body() viewModel: ExerciseActivityViewModel): Promise<ExerciseActivityViewModel> {
+	async updateActivity(@Param("activityId") _activityId: string, @Body() viewModel: ActivityViewModel): Promise<ActivityViewModel> {
 		const response = await this.service.updateActivity(viewModel);
 		if (response) {
 			return response;

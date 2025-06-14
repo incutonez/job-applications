@@ -1,19 +1,23 @@
 ﻿<script setup lang="ts">
-import { computed, ref, unref, watch } from "vue";
-import type { CommentViewModel } from "@incutonez/life-stats-spec";
+import { computed, reactive, ref, unref, watch } from "vue";
+import { type CommentViewModel } from "@incutonez/life-stats-spec";
 import BaseButton from "@/components/BaseButton.vue";
 import BaseDialog from "@/components/BaseDialog.vue";
+import BaseTabs, { type IBaseTabProps } from "@/components/BaseTabs.vue";
 import FieldDate from "@/components/FieldDate.vue";
 import FieldText from "@/components/FieldText.vue";
 import { IconAdd, IconDelete, IconEdit, IconSave } from "@/components/Icons.ts";
 import TableData from "@/components/TableData.vue";
 import { useDateCreatedColumn, useDateUpdatedColumn, useTableActions, useTableData } from "@/composables/table.ts";
 import { getUniqueId } from "@/utils/common.ts";
+import ApplicationLinksTab from "@/views/jobs/applications/ApplicationLinksTab.vue";
 import ViewCommentDialog from "@/views/jobs/applications/ViewCommentDialog.vue";
 import { provideApplicationRecord, useDeleteApplication } from "@/views/jobs/composables/applications.ts";
 import { useJobRoutes } from "@/views/jobs/composables/routes.ts";
 import FieldApplicationStatus from "@/views/jobs/shared/FieldApplicationStatus.vue";
 import FieldCompanies from "@/views/jobs/shared/FieldCompanies.vue";
+import FieldLocationTypes from "@/views/jobs/shared/FieldLocationTypes.vue";
+import ViewApplicationLinks from "@/views/jobs/ViewApplicationLinks.vue";
 import DeleteDialog from "@/views/shared/DeleteDialog.vue";
 
 export interface IViewApplicationProps {
@@ -23,17 +27,25 @@ export interface IViewApplicationProps {
 const props = defineProps<IViewApplicationProps>();
 const open = ref(true);
 const showCommentDialog = ref(false);
+const showApplicationLinksDialog = ref(false);
 const selectedComment = ref<CommentViewModel>();
 const comment = computed(() => selectedComment.value?.comment ?? "");
 const applicationId = computed(() => props.applicationId);
 const { viewRecord, save, pastedRecord, isEdit, savingApplication } = provideApplicationRecord(applicationId);
 const showDelete = ref(false);
 const { deleteApplication, deletingApplication } = useDeleteApplication();
-const data = ref<CommentViewModel[]>([]);
+const commentData = ref<CommentViewModel[]>([]);
 const title = computed(() => isEdit.value ? "Edit Application" : "Add Application");
 const { viewApplicationParent } = useJobRoutes();
-const { table } = useTableData<CommentViewModel>({
-	data,
+const tabs = reactive<IBaseTabProps[]>([{
+	title: "Comments",
+	contentClasses: "flex flex-col gap-2 pt-2",
+}, {
+	title: "Links",
+	contentClasses: "flex flex-col gap-2 pt-2",
+}]);
+const commentsTable = useTableData<CommentViewModel>({
+	data: commentData,
 	columns: [useTableActions([{
 		icon: IconEdit,
 		handler(record) {
@@ -107,7 +119,7 @@ async function onClickDelete() {
  * Source: https://tanstack.com/table/latest/docs/framework/vue/guide/table-state#using-reactive-data
  */
 watch(() => viewRecord.value?.comments, ($comments = []) => {
-	data.value = [...$comments];
+	commentData.value = [...$comments];
 }, {
 	immediate: true,
 	deep: true,
@@ -124,37 +136,50 @@ watch(() => viewRecord.value?.comments, ($comments = []) => {
 		@close="onCloseView"
 	>
 		<template #content>
-			<section class="flex flex-col space-y-4">
-				<section class="flex space-x-4">
+			<section class="flex flex-col gap-form">
+				<section class="flex gap-form">
 					<FieldCompanies
 						v-model="viewRecord.company"
 						label-align="top"
 						:custom-value="true"
-						class="w-48"
 						required
+						class="flex-1"
 					/>
 					<FieldText
 						v-model="viewRecord.positionTitle"
 						label="Position"
 						label-align="top"
-						wrapper-cls="w-48"
-						required
-					/>
-					<FieldDate
-						v-model="viewRecord.dateApplied"
-						label="Applied"
-						label-align="top"
+						wrapper-cls="flex-1"
 						required
 					/>
 				</section>
-				<section class="flex space-x-4">
+				<section class="flex gap-form">
+					<FieldApplicationStatus
+						v-model="viewRecord.status"
+						class="flex-1"
+						required
+					/>
+					<div class="flex flex-1">
+						<FieldDate
+							v-model="viewRecord.dateApplied"
+							label="Applied On"
+							label-align="top"
+							required
+						/>
+					</div>
+				</section>
+				<section class="flex gap-form">
 					<FieldText
 						v-model="viewRecord.compensation"
 						label="Compensation"
 						label-align="top"
-						wrapper-cls="w-48"
+						wrapper-cls="flex-1"
 					/>
-					<FieldApplicationStatus v-model="viewRecord.status" />
+					<FieldLocationTypes
+						v-model="viewRecord.locationType"
+						class="flex-1"
+						required
+					/>
 				</section>
 				<FieldText
 					v-model="viewRecord.url"
@@ -164,18 +189,25 @@ watch(() => viewRecord.value?.comments, ($comments = []) => {
 					required
 				/>
 			</section>
-			<section class="flex flex-col space-y-2">
-				<BaseButton
-					text="Comment"
-					class="self-start"
-					theme="info"
-					:icon="IconAdd"
-					@click="onClickAddComment"
-				/>
-				<TableData
-					class="flex-1"
-					:table="table"
-				/>
+			<section class="flex flex-col space-y-2 flex-1">
+				<BaseTabs :tabs="tabs">
+					<template #Comments>
+						<BaseButton
+							text="Comment"
+							class="self-start ml-2"
+							theme="info"
+							:icon="IconAdd"
+							@click="onClickAddComment"
+						/>
+						<TableData
+							class="flex-1 border-0 border-t"
+							:table="commentsTable.table"
+						/>
+					</template>
+					<template #Links>
+						<ApplicationLinksTab />
+					</template>
+				</BaseTabs>
 			</section>
 			<ViewCommentDialog
 				v-model="showCommentDialog"
@@ -187,6 +219,11 @@ watch(() => viewRecord.value?.comments, ($comments = []) => {
 				entity-name="this application"
 				:loading="deletingApplication"
 				@delete="onClickDelete"
+			/>
+			<ViewApplicationLinks
+				v-model="showApplicationLinksDialog"
+				:filter-id="viewRecord.id"
+				:initial-ids="viewRecord.links?.map(({id}) => id)"
 			/>
 		</template>
 		<template #footer>

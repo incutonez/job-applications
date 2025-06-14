@@ -148,6 +148,7 @@ function onHighlight(payload?: { ref: HTMLElement }) {
 				class="field-text-input w-full min-w-0"
 				placeholder="Placeholder..."
 				:display-value="getInputDisplay"
+				:required="required"
 				@click="onClickInput"
 				@blur="onBlurInput"
 				@keydown.down.up="onInputKeyDown"
